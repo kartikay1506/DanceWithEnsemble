@@ -1,0 +1,382 @@
+import 'package:farmcare/UI/jsonLoadingScreen.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../data/formdata.dart';
+
+class MainPage extends StatefulWidget {
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+// class ListItem {
+//   int value;
+//   String name;
+
+//   ListItem(this.value, this.name);
+// }
+
+class _MainPageState extends State<MainPage> {
+  GlobalKey<FormState> _key = GlobalKey<FormState>();
+  // ListItem dropDown1;
+  // ListItem dropDown2;
+  // String farmSize, manPower, machinery;
+  List<ListItem> _dropdownItems1 = [
+    ListItem(1, "Sandy Soil"),
+    ListItem(2, "Clay Soil"),
+    ListItem(3, "Peat Soil"),
+    ListItem(4, "Chalk soil"),
+    ListItem(4, "Loam soil")
+  ];
+
+  List<ListItem> _dropdownItems2 = [
+    ListItem(1, "Surface irrigation"),
+    ListItem(2, "Localized irrigation"),
+    ListItem(3, "Drip irrigation"),
+    ListItem(4, "Sprinkler irrigation"),
+    ListItem(4, "Center pivot irrigation"),
+    ListItem(4, "Lateral move irrigation"),
+    ListItem(4, "Sub-irrigation"),
+    ListItem(4, "Manual irrigation"),
+  ];
+
+  List<DropdownMenuItem<ListItem>> _dropdownMenuItems1;
+  List<DropdownMenuItem<ListItem>> _dropdownMenuItems2;
+  ListItem _selectedItem1;
+  ListItem _selectedItem2;
+
+  void initState() {
+    super.initState();
+    previousCrop = "";
+    _dropdownMenuItems1 = buildDropDownMenuItems(_dropdownItems1);
+    _selectedItem1 = _dropdownMenuItems1[0].value;
+    _dropdownMenuItems2 = buildDropDownMenuItems(_dropdownItems2);
+    _selectedItem2 = _dropdownMenuItems2[0].value;
+  }
+
+  List<DropdownMenuItem<ListItem>> buildDropDownMenuItems(List listItems) {
+    List<DropdownMenuItem<ListItem>> items = List();
+    for (ListItem listItem in listItems) {
+      items.add(
+        DropdownMenuItem(
+          child: Text(listItem.name),
+          value: listItem,
+        ),
+      );
+    }
+    return items;
+  }
+
+  navigateToNextScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => JsonLoadingScreen(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("FarmCare"),
+      ),
+      bottomSheet: Container(
+        margin: EdgeInsets.all(15.0),
+        width: size.width,
+        height: 55.0,
+        child: MaterialButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          color: Colors.green,
+          child: Text(
+            isHindi ? "आगे जाएं" : "Submit",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18.0,
+            ),
+          ),
+          onPressed: () {
+            validator();
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Container(
+          height: size.height - 150.0,
+          padding: EdgeInsets.all(20.0),
+          margin: EdgeInsets.only(bottom: 40.0),
+          child: Form(
+            key: _key,
+            child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.all(10.0),
+                  width: size.width,
+                  child: Text(
+                    "My Farm",
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 35.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(7.0),
+                  child: TextFormField(
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: isHindi ? "स्थान" : "Location",
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
+                    initialValue: finaladdress,
+                    maxLines: 3,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(7.0),
+                  child: TextFormField(
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: isHindi
+                          ? "तापमान(सेंटीग्रेड)"
+                          : "Temperature(Celcius)",
+                      fillColor: Colors.white,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                          width: 2.0,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                        ),
+                      ),
+                    ),
+                    //TODO:
+                    initialValue: temp,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(7.0),
+                  child: TextFormField(
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: isHindi ? "नमी(प्रतिशत)" : "Humidity(%)",
+                      fillColor: Colors.white,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                          width: 2.0,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                        ),
+                      ),
+                    ),
+                    //TODO:
+                    initialValue: humidity,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(7.0),
+                  child: TextFormField(
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: isHindi ? "मौसम" : "Current Season",
+                      fillColor: Colors.white,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                          width: 2.0,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                        ),
+                      ),
+                    ),
+                    //TODO:
+                    initialValue: season,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(7.0),
+                      child: DropdownButton<ListItem>(
+                        value: _selectedItem1,
+                        items: _dropdownMenuItems1,
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedItem1 = val;
+                            // Saved value of first drop down in dropDown1 variable
+                            dropDown1 = val;
+                            print(dropDown1.name);
+                          });
+                        },
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(7.0),
+                      child: DropdownButton<ListItem>(
+                        value: _selectedItem2,
+                        items: _dropdownMenuItems2,
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedItem2 = val;
+                            // Saved value of second drop down in dropDown2 variable
+                            dropDown2 = val;
+                            print(dropDown2.name);
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: EdgeInsets.all(7.0),
+                  child: TextFormField(
+                    initialValue: previousCrop,
+                    decoration: InputDecoration(
+                      labelText: isHindi ? "पिछली फसल" : "Previous Crop",
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                          width: 2.0,
+                        ),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                          width: 2.0,
+                        ),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
+                    validator: (val) {
+                      if (val.isEmpty) {
+                        return "This field is mandatory";
+                      }
+                    },
+                    onChanged: (value) {
+                      setState(() {
+                        previousCrop = value;
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(7.0),
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: isHindi
+                          ? "कृषि क्षेत्र (एकड़ में)"
+                          : "Farm Area (in Acres)",
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.limeAccent[700],
+                          width: 2.0,
+                        ),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                          width: 2.0,
+                        ),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
+                    validator: (val) {
+                      if (val.isEmpty) {
+                        return "This field is mandatory";
+                      }
+                      try {
+                        var value = double.parse(val);
+                      } on FormatException {
+                        return "Farm Area should be a numeric value";
+                      }
+                    },
+                    onChanged: (value) {
+                      setState(() {
+                        farmArea = value;
+                      });
+                    },
+                  ),
+                ),
+                Padding(padding: EdgeInsets.only(top: 20.0)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  validator() {
+    if (_key.currentState.validate()) {
+      _key.currentState.save();
+      navigateToNextScreen();
+    }
+  }
+}
